@@ -1,0 +1,107 @@
+Joshua Boltz, Username: cssc3745  (Project files are in Joshua's edoras account)
+James Lee, Username: cssc3719
+Ayoub Rammo, Username: cssc3733
+
+CS530, Spring 2021
+Assignment #2, Link-Editor Variant for XE Systems
+README
+
+Description of Program:
+ * The purpose of this program is to take in one or more listing files given by the user
+ * and write the object files for these listing files, as well as write out the ESTAB.
+ * It will take any number of listing files (provided there all part of the same program)
+ * and convert everything to object files. Each object file has a header record, a define
+ * record (if any external define symbols exist), a external reference record (if any exist),
+ * text records formatted correctly, followed by modification records (if any addresses need
+ * to be modified, and finally an end record (with or without an address after it depending
+ * on if it is the main control section or not). This program will also output a state file
+ * for the ESTAB so you can see the external symbols for each control section as well as the
+ * control section start addresses and control section lengths. 
+ * 
+ * If a memory access error has occurred in the listing file, it will notify the user that
+ * an error has occurred as well as which operand caused the access error. If no file is
+ * given, an error message will appear notifying the user to use at least one listing file
+ *
+ * To use the program, compile (instructions below), then call the program (instructions below)
+ * with the listing files you want turned into object files.
+ *
+ * NOTE: You can test the memory access error functionality by swapping ProgA.lis with ProgAOutOfBounds.lis
+ *
+
+File manifest:
+  led.c
+  Makefile
+  README
+  Software Design Document.pdf
+  Sample test files (as should be grouped together):
+    ProgA.lis OR ProgAOutOfBounds.lis  [Use ProgA for normal functionality, ProgAOutOfBounds to test error]
+    ProgB.lis
+    ProgC.lis
+    ----
+    Add.lis
+    Write.lis
+    ----
+    Copy.lis
+    ----
+  
+Compile instructions:
+  To compile, type: 
+    'make' 
+  or 
+    'gcc led.c -o led' 
+  
+  when in the same directory as the led.c and Makefile
+  
+Operating instructions:
+  To use the led program, type:
+    led <filename> {<filename> <filename> ...}
+   
+  where <filename> represents listing files that you want the object files for.
+  You can have 1 or more listing files (provided they belong to the same program)
+   
+Signicant Design Decisions:
+  - Some significant design decisions were how to go about creating the modification records and 
+    the memory checking functions. We first chose to create the memory checking function but soon
+    realized after finishing that there were significant similarities between the memory checking
+    function and creating the modification records so we chose to combine the two functions into
+    one function called memCheckAndMods. 
+  - Another significant design decision was making sure to implement the convertLine function very 
+    early on. The reason was because we knew we would all would need a function that took a line from the 
+    listing file and converted it into its 5 data columns so it was easy to use any column from the 
+    line (ie. address, symbol, directive, operand, objectcode). We chose to do this early because 
+    all other functions relied on having useful data from each line.
+  - Some other significant decisions were what development environment to use. We chose to use visual
+    studio because the debugger for it was easy to use and extremely helpful in diagnosing errors.
+  - Finally, we chose to combine pass2 and pass3 for efficiency purposes
+  
+Functionality That Was Added That Wasn't Required:
+  - The program can deal with comment lines
+  - The program will tell you exactly which file and operand caused any memory access errors
+  - If any memory access errors occur, the program will automatically delete any prior
+    object files created before the error (due to them being useless w/o completion)
+  - The program will name any object files <filename>.obj and it will name the
+    estab <main-control-section-name>.st
+  - The program can handle more than 2 symbols in an operand (ex. ENDA-LISTA-ENDB+LISTB)
+  
+  
+Known Deficiencies:
+  - The solution is pretty inefficient. It's a "working" program but not an efficient
+    one. One example of an inefficiency is when we checking for memory access violations. In
+    the program we first call my splitString function on the operand to get a list of symbols
+    but we then go through the operand character by character looking for +/- signs. This could
+    have been combined for efficiency purposes.
+  - The program cannot handle parenthesis in operands (ex. ENDA-LISTA-(ENDB-LISTB)  )
+  - Also, some of the data structures are fixed lengths, meaning if you had tons of symbols in
+    a group of files, you would need to increase some of the data structures size.
+  - This program does not work with the CSECT directive but as we understood it from the
+    prompt it said "Each control section will be in its own assembly source / listing file" so
+    we believe it did not need to handle CSECT.
+  
+    
+Lessons Learned:
+  Some good lessons learned in this program were learning a lot about the how listing files
+  are translated into object files and how ESTAB's and SYMTAB's contribute to creating these
+  object files. We also now have a deep appreciation of the hard work that goes into building
+  a linking loader and all the complexities it entails. We're also really happy with how we
+  managed to overcome some difficulties to push through to create a working program. Overall
+  we're happy with how this program turned out.
